@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -40,16 +41,44 @@ var tasks = map[string]Task{
 	},
 }
 
+// GET TASK
 func getTask(w http.ResponseWriter, r *http.Request) {
-	resp, err := json.Marshal(tasks)
+	id := chi.URLParam(r, "id")
+	task, ok := tasks[id]
 
+	if ok != ok {
+		http.Error(w, "Задача не найдена", http.StatusNoContent)
+		return
+	}
+	resp, err := json.Marshal(task)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 }
+
+// GET TASKS
 func getTasks(w http.ResponseWriter, r *http.Request) {
+	resp, err := json.Marshal(tasks)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 
 }
+
+// POST TASK
 func postTasks(w http.ResponseWriter, r *http.Request) {
+	var task Task
+	var buf bytes.Buffer
 
 }
+
+// DELETE TASK
 func deleteTask(w http.ResponseWriter, r *http.Request) {
 
 }
