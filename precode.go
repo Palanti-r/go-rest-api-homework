@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -39,6 +40,20 @@ var tasks = map[string]Task{
 	},
 }
 
+func getTask(w http.ResponseWriter, r *http.Request) {
+	resp, err := json.Marshal(tasks)
+
+}
+func getTasks(w http.ResponseWriter, r *http.Request) {
+
+}
+func postTasks(w http.ResponseWriter, r *http.Request) {
+
+}
+func deleteTask(w http.ResponseWriter, r *http.Request) {
+
+}
+
 // Ниже напишите обработчики для каждого эндпоинта
 // ...
 
@@ -47,6 +62,10 @@ func main() {
 
 	// здесь регистрируйте ваши обработчики
 	// ...
+	r.Get("/task", getTask)
+	r.Get("/tasks{id}", getTasks)
+	r.Post("/tasks", postTasks)
+	r.Delete("/tasks/{id}", deleteTask)
 
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		fmt.Printf("Ошибка при запуске сервера: %s", err.Error())
