@@ -63,7 +63,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 func getTasks(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.Marshal(tasks)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -76,11 +76,32 @@ func postTasks(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	var buf bytes.Buffer
 
+	if _, err := buf.ReadFrom(r.Body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if err := json.Unmarshal(buf.Bytes(), &task); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	tasks[task.ID] = task
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
 
 // DELETE TASK
 func deleteTask(w http.ResponseWriter, r *http.Request) {
+	var task Task
+	var buf bytes.Buffer
 
+	if _, err := buf.ReadFrom(r.Body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
 
 // Ниже напишите обработчики для каждого эндпоинта
@@ -91,7 +112,7 @@ func main() {
 
 	// здесь регистрируйте ваши обработчики
 	// ...
-	r.Get("/task", getTask)
+	r.Get("/tasks", getTask)
 	r.Get("/tasks{id}", getTasks)
 	r.Post("/tasks", postTasks)
 	r.Delete("/tasks/{id}", deleteTask)
