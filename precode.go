@@ -64,7 +64,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 }
 
 // GET TASKS
-func getTasks(w http.ResponseWriter, r *http.Request) {
+func getTasks(w http.ResponseWriter) {
 	resp, err := json.Marshal(tasks)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
