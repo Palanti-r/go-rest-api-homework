@@ -53,6 +53,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.Marshal(task)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -99,43 +100,27 @@ func postTasks(w http.ResponseWriter, r *http.Request) {
 
 // DELETE TASK
 func deleteTask(w http.ResponseWriter, r *http.Request) {
-	var task Task
-	var buf bytes.Buffer
-
-	_, err := buf.ReadFrom(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err = json.Unmarshal(buf.Bytes(), &task)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	_, ok := tasks[task.ID]
+	taskID := chi.URLParam(r, "id")
+	_, ok := tasks[taskID]
 	if !ok {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
+	delete(tasks, taskID)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }
-
-// Ниже напишите обработчики для каждого эндпоинта
-// ...
 
 func main() {
 	r := chi.NewRouter()
 
 	// здесь регистрируйте ваши обработчики
 	// ...
-	r.Get("/tasks", getTask)
-	r.Get("/tasks{id}", getTasks)
+	r.Get("/tasks", getTasks)
+	r.Get("/task/{id}", getTask)
 	r.Post("/tasks", postTasks)
-	r.Delete("/tasks/{id}", deleteTask)
+	r.Delete("/task/{id}", deleteTask)
 
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		fmt.Printf("Ошибка при запуске сервера: %s", err.Error())
