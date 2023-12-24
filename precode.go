@@ -56,7 +56,11 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+
+	_, err = w.Write(resp)
+	if err != nil {
+		return
+	}
 }
 
 // GET TASKS
@@ -67,8 +71,11 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
 
+	_, err = w.Write(resp)
+	if err != nil {
+		return
+	}
 }
 
 // POST TASK
@@ -95,8 +102,21 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	var buf bytes.Buffer
 
-	if _, err := buf.ReadFrom(r.Body); err != nil {
+	_, err := buf.ReadFrom(r.Body)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = json.Unmarshal(buf.Bytes(), &task)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, ok := tasks[task.ID]
+	if !ok {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
