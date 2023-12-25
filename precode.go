@@ -115,8 +115,6 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := chi.NewRouter()
 
-	// здесь регистрируйте ваши обработчики
-	// ...
 	r.Get("/tasks", getTasks)
 	r.Get("/task/{id}", getTask)
 	r.Post("/tasks", postTasks)
