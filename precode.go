@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -46,7 +47,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	task, ok := tasks[id]
 
-	if ok != ok {
+	if !ok {
 		http.Error(w, "Задача не найдена", http.StatusNoContent)
 		return
 	}
@@ -69,12 +70,14 @@ func getTasks(w http.ResponseWriter, _ *http.Request) {
 	resp, err := json.Marshal(tasks)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	_, err = w.Write(resp)
 	if err != nil {
+		log.Println(err)
 		return
 	}
 }
